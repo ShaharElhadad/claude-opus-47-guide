@@ -316,12 +316,51 @@ td:nth-child(3) { text-align: center; color: rgba(255,255,255,0.4); }
   border: 1px solid rgba(239,68,68,0.15);
   border-radius: 10px;
 }
+/* --- CTA Section --- */
+.cta-section {
+  text-align: center;
+  padding: 48px 24px 32px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.cta-section h2 {
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #E0E0E0;
+}
+.cta-section p {
+  color: rgba(255,255,255,0.5);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  font-family: 'Rubik', sans-serif;
+  cursor: pointer;
+  background: #E0E0E0;
+  color: #0A0A14;
+  transition: background .2s, transform .15s;
+}
+.btn-primary:hover { background: #fff; }
+.btn-primary:active { transform: scale(.98); }
+.btn-primary svg { width: 16px; height: 16px; }
+
+/* --- Footer --- */
 footer {
   text-align: center;
   padding: 32px 24px 48px;
   border-top: 1px solid rgba(255,255,255,0.08);
   max-width: 680px;
-  margin: 40px auto 0;
+  margin: 0 auto;
 }
 .footer-series {
   font-size: 12px;
@@ -701,16 +740,26 @@ footer {
     </p>
   </div>
 
-  <footer>
-    <div class="footer-series">Claude Code Tips / מדריכים</div>
-    <div class="footer-credit">
-      by <a href="https://www.instagram.com/shahar_elhadad" target="_blank">Shahar Elhadad</a>
-    </div>
-    <div class="footer-links">
-      <a href="https://shaharelhadad.github.io/claude-code-guide/">מדריך התקנה</a>
-      <a href="https://shaharelhadad.github.io/claude-code-tips/">כל הטיפים</a>
-    </div>
-  </footer>
 </article>
+
+<div class="cta-section">
+  <h2>רוצים לנסות בעצמכם?</h2>
+  <p>פתחו את Claude Code ותתחילו לעבוד עם המודל החדש. זה קל, מהיר ושווה כל דקה.</p>
+  <a href="https://shaharelhadad.github.io/claude-code-guide/" class="btn-primary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    למדריך ההתקנה המלא
+  </a>
+</div>
+
+<footer>
+  <div class="footer-series">Claude Code Tips</div>
+  <div class="footer-credit">
+    by <a href="https://www.instagram.com/shahar_elhadad" target="_blank">Shahar Elhadad</a>
+  </div>
+  <div class="footer-links">
+    <a href="https://shaharelhadad.github.io/claude-code-guide/">מדריך התקנה</a>
+    <a href="https://shaharelhadad.github.io/claude-code-tips/">כל הטיפים</a>
+  </div>
+</footer>
 </body>
 </html>
