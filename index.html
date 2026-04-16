@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Claude Opus 4.7 — המדריך המלא</title>
+<meta name="description" content="כל מה שצריך לדעת על Claude Opus 4.7 של Anthropic — היכולות החדשות, שיפורי קוד, ראייה ממוחשבת, בנצ׳מרקים ועוד">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#111;
+  --ink-soft:#2a2a2a;
+  --ink-muted:#666;
+  --ink-faint:#999;
+  --ink-ghost:#bbb;
+  --surface:#fafaf9;
+  --surface-warm:#f5f4f0;
+  --surface-card:#fff;
+  --accent:#c44b25;
+  --accent-soft:#d4714f;
+  --accent-bg:rgba(196,75,37,.06);
+  --accent-border:rgba(196,75,37,.15);
+  --green-text:#2d7a3a;
+  --green-bg:rgba(45,122,58,.06);
+  --green-border:rgba(45,122,58,.15);
+  --red-text:#b33b3b;
+  --red-bg:rgba(179,59,59,.06);
+  --blue-text:#2563eb;
+  --blue-bg:rgba(37,99,235,.06);
+  --purple-text:#7c3aed;
+  --purple-bg:rgba(124,58,237,.06);
+  --border:#e5e5e0;
+  --border-strong:#d4d4cf;
+  --code-bg:#1a1a2e;
+  --code-surface:#22223a;
+  --radius:8px;
+  --radius-lg:12px;
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+
+body{
+  font-family:'Heebo',sans-serif;
+  background:var(--surface);
+  color:var(--ink);
+  line-height:1.8;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  -webkit-font-smoothing:antialiased;
+}
+
+::selection{background:rgba(196,75,37,.15);color:var(--ink)}
+
+.reading-progress{
+  position:fixed;top:0;right:0;height:2px;
+  background:var(--accent);
+  width:0%;z-index:1000;
+  transition:width 80ms linear;
+}
+
+.sticky-header{
+  position:fixed;top:0;right:0;left:0;z-index:100;
+  padding:0 24px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(250,250,249,.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+}
+.sticky-header.visible{transform:translateY(0)}
+.sticky-header .h-title{font-size:13px;font-weight:600;color:var(--ink-muted)}
+.sticky-header .h-badge{
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:4px;
+  background:var(--accent-bg);color:var(--accent);
+  border:1px solid var(--accent-border);
+}
+
+.article-header{
+  max-width:680px;margin:0 auto;
+  padding:80px 24px 48px;
+}
+
+.breadcrumb{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;color:var(--ink-faint);
+  margin-bottom:24px;
+  letter-spacing:.2px;
+}
+.breadcrumb span{color:var(--ink-ghost)}
+
+.article-header h1{
+  font-size:clamp(28px,5vw,48px);
+  font-weight:900;line-height:1.2;
+  margin-bottom:16px;
+  letter-spacing:-.5px;
+  color:var(--ink);
+}
+
+.article-header h1 em{
+  font-style:normal;
+  color:var(--accent);
+}
+
+.article-lead{
+  font-size:clamp(16px,2vw,19px);
+  color:var(--ink-muted);
+  max-width:540px;
+  margin-bottom:28px;
+  font-weight:400;
+}
+
+.article-meta{
+  display:flex;align-items:center;gap:16px;
+  flex-wrap:wrap;
+  padding:20px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.meta-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;color:var(--ink-faint);
+  font-weight:400;
+}
+
+.meta-item svg{width:14px;height:14px;opacity:.55}
+
+.article-body{
+  max-width:680px;margin:0 auto;
+  padding:0 24px 40px;
+}
+
+.section{
+  padding:48px 0;
+  opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+
+.section.visible{opacity:1;transform:none}
+
+.section-overline{
+  font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;
+  color:var(--accent);margin-bottom:10px;
+}
+
+.section h2{
+  font-size:clamp(22px,3.5vw,32px);
+  font-weight:800;line-height:1.3;
+  margin-bottom:12px;
+  letter-spacing:-.3px;
+}
+
+.section > p{
+  color:var(--ink-muted);font-size:16px;
+  margin-bottom:28px;max-width:560px;
+}
+
+.callout{
+  background:var(--surface-warm);
+  border:1px solid var(--border);
+  border-right:3px solid var(--accent);
+  border-radius:var(--radius);
+  padding:24px 28px;
+  margin:28px 0;
+}
+
+.callout-title{
+  font-size:14px;font-weight:700;
+  margin-bottom:8px;color:var(--ink);
+  display:flex;align-items:center;gap:8px;
+}
+
+.callout-title svg{width:16px;height:16px;color:var(--accent)}
+
+.callout p{
+  color:var(--ink-muted);font-size:15px;line-height:1.85;
+}
+
+.callout strong{color:var(--ink)}
+
+.info-card{
+  background:var(--surface-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:28px 24px;
+  margin-bottom:16px;
+  transition:border-color .25s,box-shadow .25s;
+}
+
+.info-card:hover{
+  border-color:var(--border-strong);
+  box-shadow:0 4px 20px rgba(0,0,0,.04);
+}
+
+.info-card .card-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;
+  padding:4px 10px;border-radius:4px;
+  margin-bottom:14px;
+}
+
+.info-card .card-badge.coding{background:var(--green-bg);color:var(--green-text)}
+.info-card .card-badge.vision{background:var(--purple-bg);color:var(--purple-text)}
+.info-card .card-badge.reasoning{background:var(--blue-bg);color:var(--blue-text)}
+.info-card .card-badge.safety{background:var(--accent-bg);color:var(--accent)}
+.info-card .card-badge.new{background:var(--green-bg);color:var(--green-text)}
+
+.info-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:var(--ink)}
+.info-card p{color:var(--ink-muted);font-size:15px;line-height:1.85}
+
+/* Stats grid */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;margin:28px 0;
+}
+
+.stat-card{
+  background:var(--surface-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  text-align:center;
+  transition:border-color .25s,box-shadow .25s,transform .3s;
+}
+
+.stat-card:hover{
+  border-color:var(--border-strong);
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
+  transform:translateY(-2px);
+}
+
+.stat-number{
+  font-size:clamp(28px,4vw,42px);
+  font-weight:900;
+  color:var(--accent);
+  line-height:1;
+  margin-bottom:8px;
+  letter-spacing:-1px;
+}
+
+.stat-label{
+  font-size:13px;
+  color:var(--ink-muted);
+  font-weight:500;
+}
+
+/* Comparison table */
+.compare-table{
+  width:100%;border-collapse:collapse;
+  margin:28px 0;
+  background:var(--surface-card);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+
+.compare-table th{
+  padding:14px 20px;
+  font-size:13px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;
+  background:var(--surface-warm);
+  border-bottom:1px solid var(--border);
+  color:var(--ink-muted);
+  text-align:right;
+}
+
+.compare-table td{
+  padding:14px 20px;
+  font-size:14px;
+  border-bottom:1px solid var(--border);
+  color:var(--ink-soft);
+}
+
+.compare-table tr:last-child td{border-bottom:none}
+
+.compare-table .highlight{
+  color:var(--green-text);
+  font-weight:700;
+}
+
+.compare-table .old{
+  color:var(--ink-faint);
+}
+
+/* Feature list */
+.feature-list{
+  list-style:none;
+  margin:20px 0;
+}
+
+.feature-list li{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+  font-size:15px;color:var(--ink-muted);
+  line-height:1.75;
+}
+
+.feature-list li:last-child{border-bottom:none}
+
+.feature-list .icon{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+  background:var(--green-bg);color:var(--green-text);
+  font-size:12px;font-weight:700;
+}
+
+.feature-list li strong{color:var(--ink);font-weight:600}
+
+/* Terminal */
+.terminal{
+  background:var(--code-bg);
+  border-radius:var(--radius-lg);
+  margin:20px 0;overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.terminal-bar{
+  padding:10px 16px;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.terminal-bar .dots{display:flex;gap:6px}
+.terminal-bar .dots span{width:10px;height:10px;border-radius:50%;border:1.5px solid}
+.terminal-bar .dots span:nth-child(1){border-color:rgba(255,95,86,.5)}
+.terminal-bar .dots span:nth-child(2){border-color:rgba(255,189,46,.5)}
+.terminal-bar .dots span:nth-child(3){border-color:rgba(39,201,63,.5)}
+.terminal-bar .tab-name{font-size:11px;color:#666;margin-right:auto;font-family:'IBM Plex Mono',monospace}
+
+.terminal-body{
+  padding:18px 20px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;color:#a0a0c0;
+  direction:ltr;text-align:left;
+  line-height:2.1;position:relative;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+
+.terminal-body .prompt{color:var(--accent-soft);user-select:none}
+.terminal-body .comment{color:#546e7a}
+.terminal-body .cmd{color:#e0e0f0}
+.terminal-body .string{color:#a5d6a7}
+.terminal-body .flag{color:#80cbc4}
+
+/* Pricing */
+.pricing-card{
+  background:linear-gradient(135deg,#1a1a2e 0%,#2a1a3e 100%);
+  border-radius:var(--radius-lg);
+  padding:36px 32px;
+  margin:28px 0;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.pricing-card h3{
+  font-size:20px;font-weight:700;
+  margin-bottom:20px;
+  color:#fff;
+}
+
+.pricing-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.pricing-row:last-child{border-bottom:none}
+
+.pricing-label{
+  font-size:14px;
+  color:rgba(255,255,255,.6);
+}
+
+.pricing-value{
+  font-size:18px;font-weight:700;
+  color:#fff;
+  font-family:'IBM Plex Mono',monospace;
+}
+
+.pricing-value .unit{
+  font-size:12px;font-weight:400;
+  color:rgba(255,255,255,.4);
+}
+
+/* Timeline */
+.timeline{
+  margin:28px 0;
+  position:relative;
+}
+
+.timeline::before{
+  content:'';position:absolute;
+  right:11px;top:0;bottom:0;
+  width:2px;background:var(--border);
+}
+
+.timeline-item{
+  position:relative;
+  padding:0 36px 32px 0;
+}
+
+.timeline-item:last-child{padding-bottom:0}
+
+.timeline-dot{
+  position:absolute;right:4px;top:4px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent);
+  border:3px solid var(--surface);
+}
+
+.timeline-date{
+  font-size:12px;font-weight:600;
+  color:var(--accent);
+  margin-bottom:4px;
+  letter-spacing:.5px;
+}
+
+.timeline-text{
+  font-size:15px;color:var(--ink-muted);
+  line-height:1.75;
+}
+
+.timeline-text strong{color:var(--ink)}
+
+/* Footer */
+.article-footer{
+  max-width:680px;margin:0 auto;
+  padding:40px 24px 80px;
+  text-align:center;
+}
+
+.footer-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:20px;
+  background:var(--surface-warm);
+  border:1px solid var(--border);
+  font-size:12px;color:var(--ink-faint);
+  font-weight:500;
+}
+
+.footer-badge svg{width:14px;height:14px;opacity:.4}
+
+/* FAQ */
+.faq-item{
+  background:var(--surface-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:12px;
+  overflow:hidden;
+  transition:border-color .25s;
+}
+
+.faq-item:hover{border-color:var(--border-strong)}
+
+.faq-q{
+  padding:18px 24px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:15px;font-weight:600;
+  color:var(--ink);
+  user-select:none;
+}
+
+.faq-q svg{
+  width:16px;height:16px;
+  color:var(--ink-ghost);
+  transition:transform .3s;
+  flex-shrink:0;
+}
+
+.faq-item.open .faq-q svg{transform:rotate(180deg)}
+
+.faq-a{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s cubic-bezier(.22,1,.36,1),padding .3s;
+}
+
+.faq-item.open .faq-a{
+  max-height:500px;
+}
+
+.faq-a-inner{
+  padding:0 24px 18px;
+  font-size:14px;color:var(--ink-muted);
+  line-height:1.85;
+}
+
+@media(max-width:640px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .pricing-card{padding:24px 20px}
+  .compare-table{font-size:13px}
+  .compare-table th,.compare-table td{padding:10px 14px}
+}
+
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="reading-progress" id="readingProgress"></div>
+
+<header class="sticky-header" id="stickyHeader">
+  <span class="h-title">Claude Opus 4.7 — המדריך המלא</span>
+  <span class="h-badge">אפריל 2026</span>
+</header>
+
+<div class="article-header">
+  <div class="breadcrumb">
+    <span>The Terminator</span>
+    <span class="sep">/</span>
+    <span>מדריכים</span>
+    <span class="sep">/</span>
+    <span>Claude Opus 4.7</span>
+  </div>
+
+  <h1>Claude Opus <em>4.7</em><br>כל מה שצריך לדעת</h1>
+
+  <p class="article-lead">המודל המתקדם ביותר של Anthropic שוחרר ב־16 באפריל 2026. שיפורים משמעותיים בקוד, ראייה ממוחשבת, חשיבה מתקדמת ועוד.</p>
+
+  <div class="article-meta">
+    <div class="meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      16 אפריל 2026
+    </div>
+    <div class="meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      5 דקות קריאה
+    </div>
+    <div class="meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      The Terminator AI
+    </div>
+  </div>
+</div>
+
+<main class="article-body">
+
+  <!-- Section: Overview -->
+  <div class="section" id="overview">
+    <div class="section-overline">סקירה כללית</div>
+    <h2>מה זה Claude Opus 4.7?</h2>
+    <p>הדגם הכי חזק שAnthropic שחררו עד היום. ממשיך את קו Opus 4.6 עם שדרוגים בכל הפרמטרים.</p>
+
+    <div class="callout">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        בקצרה
+      </div>
+      <p>Opus 4.7 מותאם ל<strong>משימות מורכבות רב שלביות</strong>, עבודה אוטונומית לאורך זמן, ותיאום בין סוכני AI. הוא מצטיין בקוד, ניתוח מסמכים, ועבודה עם תמונות ברזולוציה גבוהה.</p>
+    </div>
+  </div>
+
+  <!-- Section: Key Numbers -->
+  <div class="section" id="numbers">
+    <div class="section-overline">מספרים</div>
+    <h2>הנתונים שמדברים</h2>
+    <p>שיפורים מדידים לעומת Opus 4.6 בכל הבנצ׳מרקים.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">+13%</div>
+        <div class="stat-label">שיפור בבנצ׳מרק קוד<br>(93 משימות)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3x</div>
+        <div class="stat-label">יותר משימות production<br>נפתרות לעומת 4.6</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">98.5%</div>
+        <div class="stat-label">דיוק בראייה ממוחשבת<br>(לעומת 54.5% ב־4.6)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">21%</div>
+        <div class="stat-label">פחות שגיאות<br>בניתוח מסמכים</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Key Features -->
+  <div class="section" id="features">
+    <div class="section-overline">יכולות מרכזיות</div>
+    <h2>מה חדש ב־Opus 4.7?</h2>
+    <p>שדרוגים משמעותיים ב-5 תחומים עיקריים.</p>
+
+    <div class="info-card">
+      <div class="card-badge coding">קוד</div>
+      <h3>הנדסת תוכנה מתקדמת</h3>
+      <p>Opus 4.7 פותר משימות קוד מורכבות שגרסאות קודמות לא הצליחו בהן. שיפור של 13% בבנצ׳מרק של 93 משימות, כולל 4 משימות שלא Opus 4.6 ולא Sonnet 4.6 הצליחו לפתור. שיפור של 10%+ בזיהוי באגים קשים ב-code review.</p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-badge vision">ראייה</div>
+      <h3>ראייה ממוחשבת ברזולוציה גבוהה</h3>
+      <p>תמונות עד 2,576 פיקסלים בצלע הארוכה (כ-3.75 מגה פיקסל) — פי 3 מהרזולוציה של גרסאות קודמות. קריאת screenshots צפופים, חילוץ מידע מדיאגרמות מורכבות, וניתוח pixel-perfect.</p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-badge reasoning">חשיבה</div>
+      <h3>רמת חשיבה xhigh חדשה</h3>
+      <p>רמת מאמץ חדשה בין high ל-max שנותנת שליטה עדינה יותר על האיזון בין עומק החשיבה למהירות התגובה. ברמות חשיבה גבוהות המודל מייצר חשיבה יסודית יותר אבל צורך יותר טוקנים.</p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-badge safety">בטיחות</div>
+      <h3>מעקב הוראות מדויק</h3>
+      <p>Opus 4.7 מבצע הוראות באופן מדויק יותר מכל גרסה קודמת. איפה שגרסאות קודמות פירשו בצורה רופפת או דילגו על פרטים, 4.7 מבצע בדיוק מה שנאמר לו. ייתכן שתצטרכו לכוון פרומפטים קיימים.</p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-badge new">חדש</div>
+      <h3>Claude Code ברקע</h3>
+      <p>Claude Code יכול עכשיו לרוץ ברקע — מפתחים יכולים להעביר משימות קוד ארוכות ל-Opus 4.7 ולתת לו לעבוד באופן עצמאי. בנוסף, פקודת /ultrareview חדשה לסקירת קוד מעמיקה.</p>
+    </div>
+  </div>
+
+  <!-- Section: Comparison -->
+  <div class="section" id="comparison">
+    <div class="section-overline">השוואה</div>
+    <h2>Opus 4.7 מול Opus 4.6</h2>
+    <p>טבלת השוואה מפורטת בין הגרסאות.</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>פרמטר</th>
+          <th>Opus 4.6</th>
+          <th>Opus 4.7</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>בנצ׳מרק קוד (93 משימות)</td>
+          <td class="old">בסיס</td>
+          <td class="highlight">+13% שיפור</td>
+        </tr>
+        <tr>
+          <td>ראייה ממוחשבת</td>
+          <td class="old">54.5%</td>
+          <td class="highlight">98.5%</td>
+        </tr>
+        <tr>
+          <td>ניתוח מסמכים</td>
+          <td class="old">בסיס</td>
+          <td class="highlight">21% פחות שגיאות</td>
+        </tr>
+        <tr>
+          <td>רזולוציית תמונה מקסימלית</td>
+          <td class="old">~800px</td>
+          <td class="highlight">2,576px</td>
+        </tr>
+        <tr>
+          <td>רמות חשיבה</td>
+          <td class="old">low, medium, high, max</td>
+          <td class="highlight">+ xhigh חדש</td>
+        </tr>
+        <tr>
+          <td>חלון הקשר</td>
+          <td class="old">1M tokens</td>
+          <td class="highlight">1M tokens</td>
+        </tr>
+        <tr>
+          <td>עלות קלט</td>
+          <td class="old">$5 / 1M tokens</td>
+          <td class="highlight">$5 / 1M tokens</td>
+        </tr>
+        <tr>
+          <td>עלות פלט</td>
+          <td class="old">$25 / 1M tokens</td>
+          <td class="highlight">$25 / 1M tokens</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section: Pricing -->
+  <div class="section" id="pricing">
+    <div class="section-overline">תמחור</div>
+    <h2>כמה זה עולה?</h2>
+    <p>אותו מחיר כמו Opus 4.6 — שדרוג ביצועים בלי עלות נוספת.</p>
+
+    <div class="pricing-card">
+      <h3>Claude Opus 4.7 API</h3>
+      <div class="pricing-row">
+        <span class="pricing-label">טוקני קלט (Input)</span>
+        <span class="pricing-value">$5 <span class="unit">/ 1M tokens</span></span>
+      </div>
+      <div class="pricing-row">
+        <span class="pricing-label">טוקני פלט (Output)</span>
+        <span class="pricing-value">$25 <span class="unit">/ 1M tokens</span></span>
+      </div>
+      <div class="pricing-row">
+        <span class="pricing-label">חלון הקשר</span>
+        <span class="pricing-value">1M <span class="unit">tokens</span></span>
+      </div>
+      <div class="pricing-row">
+        <span class="pricing-label">Model ID</span>
+        <span class="pricing-value" style="font-size:14px">claude-opus-4-7</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: How to Use -->
+  <div class="section" id="usage">
+    <div class="section-overline">שימוש</div>
+    <h2>איך להתחיל?</h2>
+    <p>Opus 4.7 זמין בכל הפלטפורמות — API, Claude.ai, ועוד.</p>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="tab-name">terminal</span>
+      </div>
+      <div class="terminal-body">
+        <span class="comment"># Python SDK</span><br>
+        <span class="cmd">pip install anthropic</span><br><br>
+        <span class="comment"># Create a message with Opus 4.7</span><br>
+        <span class="cmd">client = anthropic.Anthropic()</span><br>
+        <span class="cmd">message = client.messages.create(</span><br>
+        <span class="cmd">&nbsp;&nbsp;model=<span class="string">"claude-opus-4-7"</span>,</span><br>
+        <span class="cmd">&nbsp;&nbsp;max_tokens=<span class="flag">1024</span>,</span><br>
+        <span class="cmd">&nbsp;&nbsp;messages=[{</span><br>
+        <span class="cmd">&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"role"</span>: <span class="string">"user"</span>,</span><br>
+        <span class="cmd">&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"content"</span>: <span class="string">"Hello, Opus 4.7!"</span></span><br>
+        <span class="cmd">&nbsp;&nbsp;}]</span><br>
+        <span class="cmd">)</span>
+      </div>
+    </div>
+
+    <ul class="feature-list">
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Claude.ai</strong> — זמין מיידית למנויי Pro ו-Max</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Claude API</strong> — model ID: <code>claude-opus-4-7</code></span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Amazon Bedrock</strong> — זמין דרך AWS</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Google Vertex AI</strong> — זמין דרך GCP</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Microsoft Foundry</strong> — זמין דרך Azure</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>Claude Code</strong> — כבר מעודכן עם Opus 4.7 + מצב רקע חדש</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Section: Safety -->
+  <div class="section" id="safety">
+    <div class="section-overline">בטיחות</div>
+    <h2>בטיחות ואמינות</h2>
+    <p>Opus 4.7 שומר על פרופיל בטיחות דומה ל-4.6 עם שיפורים.</p>
+
+    <ul class="feature-list">
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>שיעורי הטעיה נמוכים</strong> — רמות מינימליות של שקר, חנפנות, ושיתוף פעולה עם שימוש לרעה</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>עמידות ב-prompt injection</strong> — שיפור משמעותי בהתנגדות לניסיונות מניפולציה על הפרומפט</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>כנות</strong> — המודל יותר כנה לגבי מה שהוא יודע ומה שהוא לא יודע</span>
+      </li>
+      <li>
+        <span class="icon">&#10003;</span>
+        <span><strong>הגנות סייבר</strong> — זיהוי וחסימה אוטומטית של בקשות סייבר מסוכנות (Project Glasswing)</span>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Cyber Verification Program
+      </div>
+      <p>אנשי אבטחת מידע יכולים לפנות לתוכנית Cyber Verification של Anthropic כדי לקבל גישה מורחבת לשימושים לגיטימיים כמו <strong>penetration testing</strong> ו<strong>מחקר פגיעויות</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Section: Timeline -->
+  <div class="section" id="timeline">
+    <div class="section-overline">ציר זמן</div>
+    <h2>משפחת Claude 4</h2>
+    <p>ההתפתחות של משפחת המודלים.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">אפריל 2026</div>
+        <div class="timeline-text"><strong>Claude Opus 4.7</strong> — המודל המתקדם ביותר. ראייה x3, קוד +13%, רמת חשיבה xhigh חדשה.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--ink-ghost)"></div>
+        <div class="timeline-date">2026</div>
+        <div class="timeline-text"><strong>Claude Opus 4.6</strong> — שדרוג משמעותי עם שיפורי קוד וחשיבה מתקדמת.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--ink-ghost)"></div>
+        <div class="timeline-date">2025</div>
+        <div class="timeline-text"><strong>Claude Haiku 4.5</strong> — המודל המהיר והקל במשפחה, מותאם למשימות פשוטות.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--ink-ghost)"></div>
+        <div class="timeline-date">2025</div>
+        <div class="timeline-text"><strong>Claude Sonnet 4.6</strong> — האיזון בין מהירות ליכולת.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: FAQ -->
+  <div class="section" id="faq">
+    <div class="section-overline">שאלות נפוצות</div>
+    <h2>שאלות ותשובות</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        מה ההבדל בין Opus 4.7 ל-Sonnet 4.6?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">Opus 4.7 הוא המודל הכי חזק ומדויק, מותאם למשימות מורכבות ואוטונומיות. Sonnet 4.6 הוא האיזון בין מהירות ליכולת, מתאים למשימות יומיומיות. Opus עולה יותר ($5/$25 לעומת $3/$15 ל-Sonnet).</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        האם צריך לשנות פרומפטים קיימים?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">ייתכן. Opus 4.7 מפרש הוראות בצורה מדויקת יותר. אם הפרומפטים שלכם הסתמכו על פרשנות "חופשית" של המודל, ייתכן שתצטרכו לכוון אותם. זה דבר טוב — המודל עושה בדיוק מה שאתם מבקשים.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        מה זה רמת חשיבה xhigh?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">רמת מאמץ חדשה בין high ל-max. נותנת חשיבה יסודית יותר ממצב high, אבל לא כמו max שצורך הרבה מאוד טוקנים. אידיאלי למשימות מורכבות שצריכות דיוק אבל לא חייבות את העומק המקסימלי.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        מה לגבי Tokenizer?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">Opus 4.7 משתמש ב-tokenizer מעודכן שמשפר יעילות עיבוד טקסט. שימו לב שאותו קלט עשוי לדרוש 1.0 עד 1.35 יותר טוקנים בהתאם לסוג התוכן. חשוב לקחת בחשבון בתכנון תקציב טוקנים.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        איפה Opus 4.7 זמין?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a"><div class="faq-a-inner">בכל מקום: Claude.ai, Claude API, Amazon Bedrock, Google Vertex AI, Microsoft Foundry, ו-Claude Code. זמין מיידית ללקוחות Pro, Max, ומפתחים עם API key.</div></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="article-footer">
+  <div class="footer-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+    נבנה על ידי The Terminator AI — seai.co.il
+  </div>
+</footer>
+
+<script>
+// Reading progress
+const progress = document.getElementById('readingProgress');
+const sticky = document.getElementById('stickyHeader');
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = Math.min((scrollTop / docHeight) * 100, 100);
+  progress.style.width = pct + '%';
+
+  if (scrollTop > 300) {
+    sticky.classList.add('visible');
+  } else {
+    sticky.classList.remove('visible');
+  }
+});
+
+// Section reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.section').forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
